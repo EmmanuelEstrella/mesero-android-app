@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer{
     private final String TAG = "EmmanuelBeacons";
     private BeaconManager beaconManager;
     final Region region = new Region(TAG, Identifier.parse("5fd85e4c-8bd1-11e6-ae22-56b6b6499611"), null, null);
-
+    //test
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
