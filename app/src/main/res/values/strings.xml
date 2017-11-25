@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Mesero App</string>
+    <string name="no_beacons">No hay Beacons en la zona.</string>
+    <string name="welcome">Bienvenido a Mesero App</string>
 </resources>
