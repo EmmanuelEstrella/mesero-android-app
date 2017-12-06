@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://E:\Android Projects\emma project\mesero-android-app\MyApplication.iml" filepath="E:\Android Projects\emma project\mesero-android-app\MyApplication.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://E:\Android Projects\emma project\mesero-android-app\app\app.iml" filepath="E:\Android Projects\emma project\mesero-android-app\app\app.iml" />
       <module fileurl="file://$PROJECT_DIR$/mesero-android-app.iml" filepath="$PROJECT_DIR$/mesero-android-app.iml" />
     </modules>
   </component>

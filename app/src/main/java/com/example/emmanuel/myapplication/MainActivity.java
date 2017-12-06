@@ -1,7 +1,16 @@
 package com.example.emmanuel.myapplication;
 
+import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.RemoteException;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.gson.Gson;
 
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
@@ -35,6 +45,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import Logic.Order;
+
 public class MainActivity extends AppCompatActivity implements BeaconConsumer, CompoundButton.OnCheckedChangeListener{
 
     EditText text;
@@ -43,6 +55,11 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
     final Region region = new Region(TAG, Identifier.parse("5fd85e4c-8bd1-11e6-ae22-56b6b6499611"), null, null);
     final int rssiMin = -80;
     private int activeTable = 0;
+
+    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
+    private int REQUEST_ENABLE_BT =89;
+
+    MainActivity instance;
 
     private LinearLayout noBeaconMsg;
     private LinearLayout menuLy;
@@ -57,11 +74,15 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
     private ArrayList<CheckBox> checkBoxes;
 
     private Button orderButton;
+
+    private  BroadcastReceiver mReceiver;
+
     //test
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         noBeaconMsg = findViewById(R.id.no_beacons_msg_ly);
         menuLy = findViewById(R.id.menu_ly);
@@ -93,6 +114,41 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
 
         orderButton = findViewById(R.id.button);
         orderButton.setEnabled(false);
+
+        instance = this;
+
+        //Ask for permissions for android M+ devices
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            if(this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED){
+                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("This App needs location Access");
+                builder.setMessage("Please grant location access so this app can detect beacons.");
+                builder.setPositiveButton(android.R.string.ok,null);
+                builder.setOnDismissListener(new DialogInterface.OnDismissListener(){
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},PERMISSION_REQUEST_COARSE_LOCATION);
+                    }
+                });
+                builder.show();
+                String s = "this is a test";
+
+
+            }
+
+        }
+
+        //verify that bluetooth is on
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter != null) {
+            if (!mBluetoothAdapter.isEnabled()) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+
+            }
+        }
+
         orderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -101,13 +157,12 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
                 new Task().execute();
             }
         });
-
-
-
         beaconManager = BeaconManager.getInstanceForApplication(this);
         beaconManager.getBeaconParsers().add(new BeaconParser()
                 .setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
-        beaconManager.bind(this);
+
+        if(mBluetoothAdapter.isEnabled())
+            beaconManager.bind(instance);
 
         successDialog = new MaterialDialog.Builder(this)
                 .title("Gracias por ordenar")
@@ -119,6 +174,75 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
 
     }
 
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        Log.d(TAG,"On activity Request"+ requestCode);
+
+        if (requestCode == REQUEST_ENABLE_BT) {
+
+            if(resultCode == RESULT_CANCELED){
+                Log.d(TAG,"On activity Result"+ resultCode);
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Mesero App necesita el adaptador de bluetooth para funcionar, de lo" +
+                        "contrario se cerrará ¿Desea activar el adaptador bluetooth?")
+                        .setTitle("Error al encender bluetooth");
+                builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                        if (mBluetoothAdapter != null) {
+                            if (!mBluetoothAdapter.isEnabled()) {
+                                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+
+                            }
+                        }
+
+                    }
+                });
+                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User cancelled the dialog
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                            finishAndRemoveTask();
+                        else
+                            finish();
+                    }
+                });
+
+
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+
+            }else if(resultCode == RESULT_OK){
+                beaconManager.bind(instance);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_COARSE_LOCATION: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "coarse location permission granted");
+                } else {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Functionality limited");
+                    builder.setMessage("Since location access has not been granted, this app will not be able to discover beacons when in the background.");
+                    builder.setPositiveButton(android.R.string.ok, null);
+                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                        }
+
+                    });
+                    builder.show();
+                }
+                return;
+            }
+        }
+    }
 
     public void messageSent(){
 
@@ -137,14 +261,18 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
     }
 
     public String getOrderString(){
+
+        ArrayList<String> items = new ArrayList<>();
         String order = "ORDEN MESA "+ activeTable + "\n";
         for (CheckBox c:
               checkBoxes) {
             if(c.isChecked())
-                order += c.getText() + "\n";
+                items.add(c.getText().toString());
 
         }
-        return order;
+        Gson gson = new Gson();
+        Order newOrder = new Order(activeTable,items);
+        return gson.toJson(newOrder);
 
 
     }
@@ -258,7 +386,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
             }
             InetAddress IPAddress = null;
             try {
-                IPAddress = InetAddress.getByName("192.168.1.111");
+                IPAddress = InetAddress.getByName("192.168.1.101");
             } catch (UnknownHostException e) {
                 e.printStackTrace();
             }
