@@ -10,12 +10,18 @@ import java.util.ArrayList;
 public class Order implements Serializable{
     private int tableId;
     private ArrayList<String> items;
+    private int positionA;
+    private int positionB;
+    private int positionC;
 
     public Order(){}
 
-    public Order(int tableId, ArrayList<String> items) {
+    public Order(int tableId, ArrayList<String> items,int positionA, int positionB, int positionC) {
         this.tableId = tableId;
         this.items = items;
+        this.positionA = positionA;
+        this.positionB = positionB;
+        this.positionC = positionC;
     }
 
     public int getTableId() {
@@ -33,4 +39,24 @@ public class Order implements Serializable{
     public void setItems(ArrayList<String> items) {
         this.items = items;
     }
+
+    public int getPositionA() {return positionA;}
+
+    public void setPositionA(int positionA) {
+        this.positionA = positionA;
+    }
+
+    public int getPositionB() {return positionB;}
+
+    public void setPositionB(int positionB) {
+        this.positionB = positionB;
+    }
+
+    public int getPositionC() {return positionC;}
+
+    public void setPositionC(int positionC) {
+        this.positionC = positionC;
+    }
+
+
 }
