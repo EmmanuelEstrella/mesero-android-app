@@ -8,6 +8,39 @@
     android:padding="20dp"
     tools:context="com.example.emmanuel.myapplication.MainActivity">
 
+    <LinearLayout
+        android:id="@+id/menu_ly"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:weightSum="10">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="Menu"
+            android:textSize="20sp"/>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/menu_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="8">
+
+
+        </android.support.v7.widget.RecyclerView>
+        <Button
+            android:id="@id/button"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:textColor="@android:color/white"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:text="Ordenar"
+            />
+
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/no_beacons_msg_ly"
@@ -33,7 +66,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/menu_ly"
+        android:visibility="gone"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -128,16 +161,5 @@
             android:text="Ordenar"
             />
     </LinearLayout>
-
-
-
-    <EditText
-        android:id="@+id/text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-
-
-
 
 </LinearLayout>

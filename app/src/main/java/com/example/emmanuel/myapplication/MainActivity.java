@@ -14,6 +14,8 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -47,6 +49,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import Logic.DataManager;
 import Logic.Order;
 
 public class MainActivity extends AppCompatActivity implements BeaconConsumer, CompoundButton.OnCheckedChangeListener{
@@ -73,27 +76,14 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
     private double morado =  0;
     private double rosa =  0;
 
-    private int point1A [] = {96,97,94,95,90,92,91,89,90,91,92,87,91,94,92,92,92,95,94,93,92,93,94,95,94,93,88,88,95,90,86};
-    private int point2A [] = {87,90,90,88,94,89,88,89,94,90,92,92,90,90,88,94,92,90,94,90,94,90,90,90,95,91,91,94,90,90,90};
-    private int point3A [] = {80,83,93,77,78,77,93,76,77,90,82,80,76,82,88,77,90,77,77,81,79,78,92,77,77,77,90,82,77,81,81};
-    private int point4A [] = {82,83,80,82,79,91,81,80,79,81,79,81,79,79,78,78,89,78,90,89,91,78,82,81,92,80,80,80,96,80,81};
-
-    private int point1B [] = {86,86,88,90,91,85,86,89,90,84,92,93,89,88,92,84,99,91,86,87,89,90,86,87,88,90,93,84,84,90,94};
-    private int point2B [] = {93,95,98,95,93,94,95,95,89,91,90,95,90,94,95,88,93,86,90,95,94,88,96,93,89,90,90,91,88,95,90};
-    private int point3B [] = {93,94,89,92,90,92,95,91,92,90,94,94,91,96,97,94,91,90,89,97,91,91,90,94,94,94,94,96,97,93,92};
-    private int point4B [] = {88,91,91,95,93,85,88,91,94,92,88,94,92,92,93,89,91,90,90,93,92,89,89,95,92,100,89,98,90,97,90};
-
-    private int point1C [] = {87,87,86,87,86,85,83,82,83,81,81,82,84,79,80,83,79,81,84,86,82,82,83,84,84,85,87,84,90,90,84};
-    private int point2C [] = {85,83,82,86,86,83,86,86,83,87,86,84,83,85,83,84,85,87,86,85,84,82,82,84,82,86,83,85,83,86,85};
-    private int point3C [] = {90,89,90,89,96,93,92,95,92,92,93,91,95,94,98,94,94,94,98,95,93,90,97,93,97,95,96,92,92,97,97};
-    private int point4C [] = {91,85,87,91,93,92,87,92,96,85,86,85,91,86,97,95,85,90,90,97,86,94,98,90,87,96,86,88,89,87,90};
-
 
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     private int REQUEST_ENABLE_BT =89;
 
     MainActivity instance;
 
+    private RecyclerView menuRecyclerView;
+    private MenuAdapter menuAdapter;
     private LinearLayout noBeaconMsg;
     private LinearLayout menuLy;
     private TextView tableTextView;
@@ -116,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        menuRecyclerView = findViewById(R.id.menu_recycler);
         noBeaconMsg = findViewById(R.id.no_beacons_msg_ly);
         menuLy = findViewById(R.id.menu_ly);
         tableTextView = findViewById(R.id.table);
@@ -208,7 +198,13 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
                 .positiveText("Cerrar")
                 .build();
 
-
+        DataManager.getInstance().initClient(this);
+        DataManager.getInstance().getMenuItems();
+        LinearLayoutManager  mLayoutManager = new LinearLayoutManager(this);
+        menuRecyclerView.setLayoutManager(mLayoutManager);
+        menuAdapter = new MenuAdapter();
+        DataManager.getInstance().setMenuItemsListeners(menuAdapter);
+        menuRecyclerView.setAdapter(menuAdapter);
 
     }
 
