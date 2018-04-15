@@ -28,4 +28,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     compile 'org.altbeacon:android-beacon-library:2.12'
     compile 'com.afollestad.material-dialogs:core:0.9.6.0'
+    compile 'com.google.code.gson:gson:2.8.2'
 }

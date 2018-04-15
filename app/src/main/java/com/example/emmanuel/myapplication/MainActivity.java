@@ -258,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
             }
             InetAddress IPAddress = null;
             try {
-                IPAddress = InetAddress.getByName("192.168.0.2");
+                IPAddress = InetAddress.getByName("192.168.1.101");
             } catch (UnknownHostException e) {
                 e.printStackTrace();
             }
