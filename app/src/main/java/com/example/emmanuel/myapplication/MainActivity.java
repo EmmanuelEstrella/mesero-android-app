@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
             public void onClick(View view) {
                 if(activeTable != 0)
                     Log.d("CLICKED",getOrderString());
-                new Task().execute();
+
             }
         });
         beaconManager = BeaconManager.getInstanceForApplication(this);
@@ -423,163 +423,21 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
                             aux3 = 0;
 
 
-                             /*   for (int i = 0; i <= 30; i++) {
-
-                                    aux += Math.pow((point1A[i] - rssiA[i]), 2);
+                                 for(int i = 0; i <= 29; i++){
+                                    aux += rssiA[i];
+                                    aux2 += rssiB[i];
+                                    aux3 += rssiC[i];
                                 }
-
-                                aux2 = (Math.sqrt(aux)) / 31;
-
-                                Log.i(TAG,"numero1a: "+ aux2);
-                                aux2 = 0;
-                                aux = 0;
-
-                                for (int i = 0; i <= 30; i++) {
-
-                                    aux += Math.pow((point2A[i] - rssiA[i]), 2);
-                                }
-
-                                aux2 = (Math.sqrt(aux)) / 31;
-
-                                Log.i(TAG,"numero2a: "+ aux2);
-                                aux2 = 0;
-                                aux = 0;
-
-                                for (int i = 0; i <= 30; i++) {
-
-                                    aux += Math.pow((point3A[i] - rssiA[i]), 2);
-                                }
-
-                                aux2 = (Math.sqrt(aux)) / 31;
-
-                                Log.i(TAG,"numero3a: "+ aux2);
-                                aux2 = 0;
-                                aux = 0;
-
-                                for (int i = 0; i <= 30; i++) {
-
-                                    aux += Math.pow((point4A[i] - rssiA[i]), 2);
-                                }
-
-                                aux2 = (Math.sqrt(aux)) / 31;
-
-                                Log.i(TAG,"numero4a: "+ aux2);
-                                aux2 = 0;
-                                aux = 0;
+                                rosa = aux/30;
+                                Log.i(TAG,"POSICION1:"+rosa);
+                                amarillo = aux2/30;
+                                Log.i(TAG,"POSICION2:"+amarillo);
+                                morado = aux3/30;
+                                Log.i(TAG,"POSICION3:"+morado);
 
 
 
-
-
-                                for (int i = 0; i <= 30; i++) {
-
-                                    aux += Math.pow((point1B[i] - rssiB[i]), 2);
-                                }
-
-                                aux2 = (Math.sqrt(aux)) / 31;
-
-                                Log.i(TAG,"numero1b: "+ aux2);
-                                aux2 = 0;
-                                aux = 0;
-
-                                for (int i = 0; i <= 30; i++) {
-
-                                    aux += Math.pow((point2B[i] - rssiB[i]), 2);
-                                }
-
-                                aux2 = (Math.sqrt(aux)) / 31;
-
-                                Log.i(TAG,"numero2b: "+ aux2);
-                                aux2 = 0;
-                                aux = 0;
-
-                                for (int i = 0; i <= 30; i++) {
-
-                                    aux += Math.pow((point3B[i] - rssiB[i]), 2);
-                                }
-
-                                aux2 = (Math.sqrt(aux)) / 31;
-
-                                Log.i(TAG,"numero3b: "+ aux2);
-                                aux2 = 0;
-                                aux = 0;
-
-                                for (int i = 0; i <= 30; i++) {
-
-                                    aux += Math.pow((point4B[i] - rssiB[i]), 2);
-                                }
-
-                                aux2 = (Math.sqrt(aux)) / 31;
-
-                                Log.i(TAG,"numero4b: "+ aux2);
-                                aux2 = 0;
-                                aux = 0;
-
-
-
-                                for (int i = 0; i <= 30; i++) {
-
-                                    aux += Math.pow((point1C[i] - rssiC[i]), 2);
-                                }
-
-                                aux2 = (Math.sqrt(aux)) / 31;
-
-                                Log.i(TAG,"numero1c: "+ aux2);
-                                aux2 = 0;
-                                aux = 0;
-
-                                for (int i = 0; i <= 30; i++) {
-
-                                    aux += Math.pow((point2C[i] - rssiC[i]), 2);
-                                }
-
-                                aux2 = (Math.sqrt(aux)) / 31;
-
-                                Log.i(TAG,"numero2c: "+ aux2);
-                                aux2 = 0;
-                                aux = 0;
-
-                                for (int i = 0; i <= 30; i++) {
-
-                                    aux += Math.pow((point3C[i] - rssiC[i]), 2);
-                                }
-
-                                aux2 = (Math.sqrt(aux)) / 31;
-
-                                Log.i(TAG,"numero3c: "+ aux2);
-                                aux2 = 0;
-                                aux = 0;
-
-                                for (int i = 0; i <= 30; i++) {
-
-                                    aux += Math.pow((point4C[i] - rssiC[i]), 2);
-                                }
-
-                                aux2 = (Math.sqrt(aux)) / 31;
-
-                                Log.i(TAG,"numero4c: "+ aux2);
-                                aux2 = 0;
-                                aux = 0;
-
-
-                                Log.i(TAG, "yaaaaaaaaaaaaaaaaa");
-
-
-                          */  for(int i = 0; i <= 29; i++){
-                                aux += rssiA[i];
-                                aux2 += rssiB[i];
-                                aux3 += rssiC[i];
                             }
-                            rosa = aux/30;
-                            Log.i(TAG,"POSICION1:"+rosa);
-                            amarillo = aux2/30;
-                            Log.i(TAG,"POSICION2:"+amarillo);
-                            morado = aux3/30;
-                            Log.i(TAG,"POSICION3:"+morado);
-
-
-
-                        }
 
 
 
@@ -661,104 +519,5 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
             orderButton.setEnabled(false);
     }
 
-    public class Task extends AsyncTask<Void,Void,Void>{
 
-        @Override
-        protected Void doInBackground(Void... voids) {
-            BufferedReader inFromUser =
-                    new BufferedReader(new InputStreamReader(System.in));
-            DatagramSocket clientSocket = null;
-            try {
-                clientSocket = new DatagramSocket(9877);;
-            } catch (SocketException e) {
-                e.printStackTrace();
-            }
-            InetAddress IPAddress = null;
-            try {
-                IPAddress = InetAddress.getByName("192.168.0.11");
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-            }
-            byte[] sendData;
-            byte[] receiveData = new byte[1024];
-            String sentence = getOrderString();
-            sendData = sentence.getBytes();
-            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
-
-            try {
-                clientSocket.send(sendPacket);
-                Log.d("MAIN", "PACKET" + sendPacket.getData());
-                messageSent();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-
-            DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-            try {
-                clientSocket.receive(receivePacket);
-                String data1 = new String( receivePacket.getData());
-                Log.i(TAG,"Data:"+data1);
-                if (data1.length() > 0){
-                    MainActivity.this.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            successDialog = new MaterialDialog.Builder(MainActivity.this)
-                                    .title("Su orden a llegado")
-                                    .content("Favor retirar su orden")
-                                    .positiveText("retirar mesero")
-                                    .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                        @Override
-                                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-
-                                            DatagramSocket clientSocket = null;
-                                            try {
-                                                clientSocket = new DatagramSocket(9877);;
-                                            } catch (SocketException e) {
-                                                e.printStackTrace();
-                                            }
-                                            InetAddress IPAddress = null;
-                                            try {
-                                                IPAddress = InetAddress.getByName("192.168.0.10");
-                                            } catch (UnknownHostException e) {
-                                                e.printStackTrace();
-                                            }
-                                            byte[] sendData;
-                                            String sentence = "5";
-                                            sendData = sentence.getBytes();
-
-                                            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
-                                            Log.i(TAG,"Data:");
-                                        }
-                                    })
-                                    .show();
-                            Log.i(TAG,"mostro:");
-                        }
-                    });
-
-
-
-
-
-
-
-
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            clientSocket.close();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            Log.d("MAIN", "SENT");
-
-        }
-    }
 }
