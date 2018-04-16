@@ -10,6 +10,7 @@ public class MenuItem implements Serializable {
 
     private String name;
     private float price;
+    private int quantity = 0;
 
     public MenuItem() {
     }
@@ -33,5 +34,20 @@ public class MenuItem implements Serializable {
 
     public void setPrice(float price) {
         this.price = price;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public int changeQuantity(int valueToAdd){
+        quantity = quantity + valueToAdd;
+        if(quantity < 0)
+            quantity = 0;
+        return quantity;
     }
 }

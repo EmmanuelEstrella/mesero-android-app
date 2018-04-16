@@ -1,24 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
-    android:padding="10dp">
-    <TextView
-        android:id="@+id/item_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textSize="16dp"
-        android:text="Hambuerguesa"
-        />
-    <TextView
-        android:id="@+id/item_price"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:layout_below="@id/item_name"
-        android:text="$395"
-        />
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:weightSum="10">
 
-</RelativeLayout>
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_weight="6"
+        android:layout_height="match_parent"
+        android:padding="10dp">
+        <TextView
+            android:id="@+id/item_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:text="Hambuerguesa"
+            />
+        <TextView
+            android:id="@+id/item_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_below="@id/item_name"
+            android:text="$395"
+            />
+
+    </RelativeLayout>
+    <LinearLayout
+        android:padding="10dp"
+        android:layout_weight="4"
+        android:layout_width="0dp"
+        android:orientation="vertical"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:weightSum="7"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <android.support.v7.widget.AppCompatImageView
+                app:tint="@color/green_icons"
+                android:id="@+id/item_add"
+                android:background="?selectableItemBackgroundBorderless"
+                app:srcCompat="@drawable/ic_add_circle_black_24dp"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:scaleType="center"
+                android:layout_height="match_parent" />
+            <EditText
+                android:text="1"
+                android:id="@+id/item_quantity"
+                android:gravity="center"
+                android:layout_weight="3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                />
+            <android.support.v7.widget.AppCompatImageView
+                app:tint="@color/red_icons"
+                android:background="?selectableItemBackgroundBorderless"
+                app:srcCompat="@drawable/ic_remove_circle_black_24dp"
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:scaleType="center"
+                android:id="@+id/item_remove"
+                android:layout_height="match_parent" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
