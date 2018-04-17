@@ -1,16 +1,13 @@
-package Logic;
+package com.example.emmanuel.myapplication.Logic;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
-import com.androidnetworking.interfaces.JSONArrayRequestListener;
 import com.androidnetworking.interfaces.ParsedRequestListener;
 import com.example.emmanuel.myapplication.MenuItemsListener;
-
-import org.json.JSONArray;
+import com.example.emmanuel.myapplication.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +18,7 @@ import java.util.List;
 
 public class DataManager {
 
-    private String baseUrl = "http://192.168.137.1:8000/api/";
+    private String baseUrl = "";
     static DataManager instance;
     private ArrayList<MenuItemsListener> menuItemsListeners;
     private DataManager(){
@@ -39,6 +36,8 @@ public class DataManager {
         menuItemsListeners.add(menuItemsListener);
     }
     public void initClient(Context appContext){
+
+        baseUrl = appContext.getString(R.string.server_address) +"/api/";
         AndroidNetworking.initialize(appContext);
     }
 

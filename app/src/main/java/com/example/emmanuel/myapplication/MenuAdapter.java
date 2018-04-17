@@ -10,7 +10,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import Logic.MenuItem;
+import com.example.emmanuel.myapplication.Logic.MenuItem;
 
 /**
  * Created by Emmanuel on 15/04/2018.
@@ -37,7 +37,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuItemHolder
     public void onBindViewHolder(MenuItemHolder holder, int position) {
         holder.name.setText(menuItems.get(position).getName());
         holder.price.setText( String.valueOf(menuItems.get(position).getPrice()) );
-        holder.quantity.setText(menuItems.get(position).getQuantity());
+        holder.quantity.setText(String.valueOf(menuItems.get(position).getQuantity()));
     }
 
 
@@ -83,7 +83,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuItemHolder
         }
 
         public void  updateQuantityText(int value){
-            quantity.setText(value);
+            quantity.setText(String.valueOf(value));
         }
 
     }

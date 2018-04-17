@@ -1,4 +1,4 @@
-package Logic;
+package com.example.emmanuel.myapplication.Logic;
 
 import java.io.Serializable;
 
@@ -13,6 +13,7 @@ public class MenuItem implements Serializable {
     private int quantity = 0;
 
     public MenuItem() {
+        quantity = 0;
     }
 
     public MenuItem(String name, float price) {

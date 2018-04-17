@@ -1,4 +1,4 @@
-package Logic;
+package com.example.emmanuel.myapplication.Logic;
 
 import java.io.Serializable;
 import java.util.ArrayList;
