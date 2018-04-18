@@ -33,6 +33,7 @@ import org.altbeacon.beacon.Identifier;
 import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,30 +41,13 @@ import java.util.Collection;
 import com.example.emmanuel.myapplication.Logic.DataManager;
 import com.example.emmanuel.myapplication.Logic.Order;
 
-public class MainActivity extends AppCompatActivity implements BeaconConsumer, CompoundButton.OnCheckedChangeListener{
+public class MainActivity extends AppCompatActivity implements BeaconConsumer, CompoundButton.OnCheckedChangeListener, OrderSentListener{
 
-    EditText text;
     private final String TAG = "EmmanuelBeacons";
     private BeaconManager beaconManager;
     final Region region = new Region(TAG, Identifier.parse("5fd85e4c-8bd1-11e6-ae22-56b6b6499611"), null, null);
     final int rssiMin = -80;
     private int activeTable = 0;
-    private int positionA = 0;
-    private int positionB = 0;
-    private int positionC = 0;
-    private double [] rssiA;
-    private double [] rssiB;
-    private double [] rssiC;
-    private int a = 0;
-    private int b2 = 0;
-    private int c2 = 0;
-    private double aux =  0;
-    private double aux2 =  0;
-    private double aux3 =  0;
-    private double amarillo =  0;
-    private double morado =  0;
-    private double rosa =  0;
-
 
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     private int REQUEST_ENABLE_BT =89;
@@ -75,14 +59,11 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
     private LinearLayout noBeaconMsg;
     private LinearLayout menuLy;
     private TextView tableTextView;
-    private CheckBox hamburger;
-    private CheckBox salad;
-    private CheckBox pizza;
-    private CheckBox pasta;
+
 
     private MaterialDialog successDialog;
+    private MaterialDialog emptyOrderDialog;
 
-    private ArrayList<CheckBox> checkBoxes;
 
     private Button orderButton;
 
@@ -97,39 +78,10 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
         menuRecyclerView = findViewById(R.id.menu_recycler);
         noBeaconMsg = findViewById(R.id.no_beacons_msg_ly);
         menuLy = findViewById(R.id.menu_ly);
-        tableTextView = findViewById(R.id.table);
+        tableTextView = findViewById(R.id.active_table);
         noBeaconMsg.setVisibility(View.VISIBLE);
         menuLy.setVisibility(View.GONE);
-
-        checkBoxes = new ArrayList<>();
-        rssiA = new double[100];
-        rssiB = new double[100];
-        rssiC = new double[100];
-
-
-
-
-        hamburger = findViewById(R.id.check_hambur);
-        hamburger.setOnCheckedChangeListener(this);
-
-        checkBoxes.add(hamburger);
-
-        pizza = findViewById(R.id.check_pizza);
-        pizza.setOnCheckedChangeListener(this);
-        checkBoxes.add(pizza);
-
-        salad = findViewById(R.id.check_salad);
-        salad.setOnCheckedChangeListener(this);
-        checkBoxes.add(salad);
-
-        pasta = findViewById(R.id.check_pasta);
-        pasta.setOnCheckedChangeListener(this);
-        checkBoxes.add(pasta);
-
-        text = findViewById(R.id.text);
-
-        orderButton = findViewById(R.id.button);
-        orderButton.setEnabled(false);
+        orderButton = findViewById(R.id.order_button);
 
         instance = this;
 
@@ -148,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
                     }
                 });
                 builder.show();
-                String s = "this is a test";
+
 
 
             }
@@ -165,14 +117,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
             }
         }
 
-        orderButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(activeTable != 0)
-                    Log.d("CLICKED",getOrderString());
 
-            }
-        });
         beaconManager = BeaconManager.getInstanceForApplication(this);
         beaconManager.getBeaconParsers().add(new BeaconParser()
                 .setBeaconLayout("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24"));
@@ -180,11 +125,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
         if(mBluetoothAdapter.isEnabled())
             beaconManager.bind(instance);
 
-        successDialog = new MaterialDialog.Builder(this)
-                .title("Gracias por ordenar")
-                .content("Su orden fue enviada satisfactoriamente.")
-                .positiveText("Cerrar")
-                .build();
+
 
         DataManager.getInstance().initClient(this);
         DataManager.getInstance().getMenuItems();
@@ -192,9 +133,46 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
         menuRecyclerView.setLayoutManager(mLayoutManager);
         menuAdapter = new MenuAdapter();
         DataManager.getInstance().setMenuItemsListeners(menuAdapter);
+        DataManager.getInstance().setOrderSentListener(this);
         menuRecyclerView.setAdapter(menuAdapter);
 
+        orderButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(activeTable != 0 && !DataManager.getInstance().isOrderEmpty() ){
+                    Log.d("CLICKED","SEND ORDER");
+                    try
+                    {
+                        DataManager.getInstance().sendOrder(getOrderString());
+                    }catch ( JSONException e){
+
+                    }
+                }else{
+                    emptyOrderDialog.show();
+                }
+
+
+
+            }
+        });
+        initDialogs();
+
     }
+
+    private void initDialogs(){
+        successDialog = new MaterialDialog.Builder(this)
+                .title("Gracias por ordenar")
+                .content("Su orden fue enviada satisfactoriamente.")
+                .positiveText("Cerrar")
+                .build();
+
+        emptyOrderDialog = new MaterialDialog.Builder(this)
+                .title("No hay ningun item agregado.")
+                .content("Debe agregar por lo menos 1 item del menu para realizar una order.")
+                .positiveText("Cerrar")
+                .build();
+    }
+
 
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         Log.d(TAG,"On activity Request"+ requestCode);
@@ -272,10 +250,6 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
             @Override
             public void run() {
                 successDialog.show();
-                for (CheckBox e:
-                     checkBoxes) {
-                    e.setChecked(false);
-                }
 
             }
         });
@@ -284,17 +258,11 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
 
     public String getOrderString(){
 
-        ArrayList<String> items = new ArrayList<>();
-        String order = "ORDEN MESA "+ activeTable + positionA + positionB + positionC +"\n";
-        for (CheckBox c:
-              checkBoxes) {
-            if(c.isChecked())
-                items.add(c.getText().toString());
-
-        }
         Gson gson = new Gson();
-        Order newOrder = new Order(activeTable,items,positionA,positionB,positionC);
-        return gson.toJson(newOrder);
+        Order newOrder = new Order(activeTable, DataManager.getInstance().getOderedItems(), 1, 2, 3 );
+        String serializedOrder = gson.toJson(newOrder);
+        Log.d(TAG, "SERIALIZED ORDER: " + serializedOrder);
+        return serializedOrder;
 
 
     }
@@ -330,14 +298,15 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
             @Override
             public void didEnterRegion(Region region) {
                 Log.i(TAG, "I just saw an beacon for the first time!");
+
+
+
             }
 
             @Override
             public void didExitRegion(Region region) {
                 Log.i(TAG, "I no longer see an beacon");
-//                getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.fragment_container,initialFragment)
-//                        .commit();
+                showMenu(false, 0);
             }
 
             @Override
@@ -355,137 +324,20 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
 
             @Override
             public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-                //Log.i(TAG,"Waiting for beacon");
-                if(beacons.size()>0){
-//                    Log.i(TAG,"-----printing array " + logCounter);
-//                    Log.i(TAG,"-----printing array size " + beacons.size());
-                    for( Beacon b: beacons){
-//                        Log.i(TAG,"Menor "+b.getId3().toInt());
- //                       Log.i(TAG,"RSSI "+b.getRssi());
- //                       Log.i(TAG,"d "+b.getDistance());
 
-                        if(b.getId2().toInt() == 10  && activeTable != 0){
-//                        Log.i(TAG,"MAJOR:"+activeBeacon.getId2().toInt());
+                for( Beacon b: beacons){
 
-                            if(b.getId3().toInt() == 3){
-                                rssiA[a] =b.getDistance();
-//                                a++;
-//                                Log.i(TAG,"Distancia1:"+b.getDistance());
-//                                Log.i(TAG,"POSICION1:"+positionA);
-//                                Log.i(TAG,"numero:"+a);
-                                a++;
-                            }
-                            else if (b.getId3().toInt() == 4){
-                                rssiB[b2] = b.getDistance();
-
-//                                Log.i(TAG,"POSICION2:"+positionB);
-//                                Log.i(TAG,"numero:"+b2);
-                                b2++;
-//                                a++;
-
-                            }
-                            else if (b.getId3().toInt() == 5){
-
-                                    rssiC[c2] =b.getDistance();
-
-//                                Log.i(TAG,"POSICION3:"+positionC);
-//                                Log.i(TAG,"numero:"+c2);
-//                                a++;
-                                c2++;
-
-                            }
-//
-                        }
-
-
-                        if(a > 29 && b2 > 29 && c2 > 29) {
-                            a = 0;
-                            b2 = 0;
-                            c2 = 0;
-                            aux = 0;
-                            aux2 = 0;
-                            aux3 = 0;
-
-
-                                 for(int i = 0; i <= 29; i++){
-                                    aux += rssiA[i];
-                                    aux2 += rssiB[i];
-                                    aux3 += rssiC[i];
-                                }
-                                rosa = aux/30;
-                                Log.i(TAG,"POSICION1:"+rosa);
-                                amarillo = aux2/30;
-                                Log.i(TAG,"POSICION2:"+amarillo);
-                                morado = aux3/30;
-                                Log.i(TAG,"POSICION3:"+morado);
-
-
-
-                            }
-
-
-
-                        if(b.getRssi() > rssiMin && activeTable != b.getId3().toInt() && b.getId2().toInt() !=0){
-                            Log.i(TAG,"BEACON FOUND!");
-                            Log.i(TAG,"MAC:"+b.getBluetoothAddress());
-                            Log.i(TAG,"MAJOR:"+b.getId2().toInt());
-                            Log.i(TAG,"MINOR:"+b.getId3().toInt());
-                            Log.i(TAG,"RSSI:"+b.getRssi());
-                            activeTable = b.getId3().toInt();
-//
-                          showMenu(true, activeTable);
-                        }
-
+//                    Log.d(TAG," BEACON MINOR" + b.getId3());
+//                    Log.d(TAG," BEACON MAYOR" + b.getId2());
+//                    Log.d(TAG," BEACON RSSI" + b.getRssi());
+                    if(activeTable != b.getId3().toInt() && b.getRssi() >= rssiMin ){
+                        activeTable = b.getId3().toInt();
+                        showMenu(true, activeTable);
                     }
-//                    logCounter++;
-                    //final Beacon activeBeacon = beacons.iterator().next();
-
-                        //Log.i(TAG,"MAC:"+activeBeacon.getBluetoothAddress());
-//                        Log.i(TAG,"MAJOR:"+activeBeacon.getId2().toInt());
-//                        Log.i(TAG,"MINOR:"+activeBeacon.getId3().toInt());
-                       // Log.i(TAG,"RSSI:"+activeBeacon.getRssi());
-//                    activeBeacon.isExtraBeaconData()
-//
-//
-//
-//                    if(activeBeacon.getId2().toInt() == 0 && activeTable != 0){
-//                        Log.i(TAG,"MAJOR:"+activeBeacon.getId2().toInt());
-//
-//                        if(activeBeacon.getId3().toInt() == 3){
-//                            puntoA = activeBeacon.getRssi();
-//                            Log.i(TAG,"POSICION1:"+puntoA);
-//                        }
-//                        else if (activeBeacon.getId3().toInt() == 4){
-//                            puntoB = activeBeacon.getRssi();
-//                            Log.i(TAG,"POSICION2:"+puntoB);
-//                        }
-//                        else{
-//                            puntoC =activeBeacon.getRssi();
-//                            Log.i(TAG,"POSICION3:"+puntoC);
-//                        }
-//
-//                    }
-//
-//                    if(activeBeacon.getRssi() > rssiMin && activeTable != activeBeacon.getId3().toInt() && activeBeacon.getId2().toInt() !=0){
-//                        Log.i(TAG,"BEACON FOUND!");
-//                        Log.i(TAG,"MAC:"+activeBeacon.getBluetoothAddress());
-//                        Log.i(TAG,"MAJOR:"+activeBeacon.getId2().toInt());
-//                        Log.i(TAG,"MINOR:"+activeBeacon.getId3().toInt());
-//                        Log.i(TAG,"RSSI:"+activeBeacon.getRssi());
-//                        activeTable = activeBeacon.getId3().toInt();
-//                        showMenu(true, activeTable);
-//                    }
-
-
-
-
-                }else if( activeTable != 0){
-                    showMenu(false, 0);
-                    activeTable = 0;
                 }
             }
-        });
 
+        });
         try {
             beaconManager.startRangingBeaconsInRegion(region);
         }catch (RemoteException e){
@@ -497,11 +349,21 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
 
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-        if(hamburger.isChecked() || salad.isChecked() || pizza.isChecked() || pasta.isChecked())
-            orderButton.setEnabled(true);
-        else
-            orderButton.setEnabled(false);
+
     }
 
 
+    @Override
+    public void onOrderSent(boolean successful) {
+
+        if(successful){
+            successDialog.show();
+            return;
+        }
+
+        Log.d("ERROR", "ERROR SENDING ORDER");
+
+
+
+    }
 }

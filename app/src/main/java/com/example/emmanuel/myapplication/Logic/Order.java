@@ -9,14 +9,14 @@ import java.util.ArrayList;
 
 public class Order implements Serializable{
     private int tableId;
-    private ArrayList<String> items;
+    private ArrayList<MenuItem> items;
     private int positionA;
     private int positionB;
     private int positionC;
 
     public Order(){}
 
-    public Order(int tableId, ArrayList<String> items,int positionA, int positionB, int positionC) {
+    public Order(int tableId, ArrayList<MenuItem> items,int positionA, int positionB, int positionC) {
         this.tableId = tableId;
         this.items = items;
         this.positionA = positionA;
@@ -32,11 +32,11 @@ public class Order implements Serializable{
         this.tableId = tableId;
     }
 
-    public ArrayList<String> getItems() {
+    public ArrayList<MenuItem> getItems() {
         return items;
     }
 
-    public void setItems(ArrayList<String> items) {
+    public void setItems(ArrayList<MenuItem> items) {
         this.items = items;
     }
 

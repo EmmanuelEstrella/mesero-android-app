@@ -14,12 +14,30 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:weightSum="10">
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:text="Menu"
-            android:textSize="20sp"/>
+            android:orientation="horizontal"
+            >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Menu"
+                android:textSize="20sp"/>
+
+            <TextView
+                android:id="@+id/active_table"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Table"
+                android:textSize="20sp"/>
+        </LinearLayout>
+
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/menu_recycler"
             android:layout_width="match_parent"
@@ -29,7 +47,7 @@
 
         </android.support.v7.widget.RecyclerView>
         <Button
-            android:id="@id/button"
+            android:id="@+id/order_button"
             android:layout_marginTop="10dp"
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -65,101 +83,5 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:visibility="gone"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <ScrollView
-            android:visibility="visible"
-            android:layout_weight="1"
-            android:layout_width="match_parent"
-            android:layout_height="0dp">
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    app:srcCompat="@drawable/ic_restaurant_menu_black_24dp"
-                    android:tint="@color/colorAccent"
-                    android:layout_height="60dp" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/welcome"
-                    android:textColor="@color/secondary_text"
-                    android:textAlignment="center"
-                    android:textSize="18sp" />
-                <TextView
-                    android:id="@+id/table"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Mesa 0"
-                    android:textColor="@color/secondary_text"
-                    android:textAlignment="center"
-                    android:textSize="18sp" />
-                <LinearLayout
-                    android:paddingStart="20dp"
-                    android:paddingLeft="20dp"
-                    android:paddingEnd="20dp"
-                    android:paddingRight="20dp"
-                    android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
-                        android:text="Menu"
-                        android:textColor="@color/primary_text"
-                        android:textSize="18sp" />
-
-                    <CheckBox
-                        android:id="@+id/check_hambur"
-                        android:text="Hamburguesa"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginBottom="5dp"
-                        />
-                    <CheckBox
-                        android:text="Pizza"
-                        android:id="@+id/check_pizza"
-                        android:layout_marginBottom="5dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-                    <CheckBox
-                        android:text="Ensalada Cesar"
-                        android:id="@+id/check_salad"
-                        android:layout_marginBottom="5dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-                    <CheckBox
-                        android:text="Pasta Carbonara"
-                        android:id="@+id/check_pasta"
-                        android:layout_marginBottom="5dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
-
-
-
-                </LinearLayout>
-            </LinearLayout>
-        </ScrollView>
-        <Button
-            android:id="@+id/button"
-            android:layout_marginTop="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@android:color/white"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:text="Ordenar"
-            />
-    </LinearLayout>
 
 </LinearLayout>
