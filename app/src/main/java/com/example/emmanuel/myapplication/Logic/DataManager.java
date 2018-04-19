@@ -90,10 +90,13 @@ public class DataManager {
 
                     @Override
                     public void onError(ANError anError) {
-                        Log.d("ERROR", anError.getErrorBody());
+
                         for (OrderSentListener listener : orderSentListeners) {
                             listener.onOrderSent(false);
                         }
+
+                        Log.d("RECEIVED", "ERROR:" + anError.getErrorCode());
+                        Log.d("RECEIVED", anError.getErrorBody());
                     }
                 });
 

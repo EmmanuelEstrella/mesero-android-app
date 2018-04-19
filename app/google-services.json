@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "819588892689",
+    "firebase_url": "https://meseroandroidapp.firebaseio.com",
+    "project_id": "meseroandroidapp",
+    "storage_bucket": "meseroandroidapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:819588892689:android:20bf38ee982fbe00",
+        "android_client_info": {
+          "package_name": "com.example.emmanuel.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "819588892689-e4f2cq9bbe4ro8al23viu08fr0719i85.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.emmanuel.myapplication",
+            "certificate_hash": "24ddb511b8bac013fe208aff32ed00c77a40294b"
+          }
+        },
+        {
+          "client_id": "819588892689-mu4g5npku5qtlf6srg5ffkdbkti6ntur.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuu7iA0Br7nhAQyV4LRUl3i5R9l-L8HyU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "819588892689-mu4g5npku5qtlf6srg5ffkdbkti6ntur.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

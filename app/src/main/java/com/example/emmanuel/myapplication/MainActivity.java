@@ -16,13 +16,12 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
 
 import org.altbeacon.beacon.Beacon;
@@ -35,7 +34,6 @@ import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 import org.json.JSONException;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import com.example.emmanuel.myapplication.Logic.DataManager;
@@ -63,6 +61,9 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
 
     private MaterialDialog successDialog;
     private MaterialDialog emptyOrderDialog;
+    private MaterialDialog connectionErrorDialog;
+    private MaterialDialog orderProgressDialog;
+
 
 
     private Button orderButton;
@@ -141,12 +142,19 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
             public void onClick(View view) {
                 if(activeTable != 0 && !DataManager.getInstance().isOrderEmpty() ){
                     Log.d("CLICKED","SEND ORDER");
-                    try
-                    {
-                        DataManager.getInstance().sendOrder(getOrderString());
-                    }catch ( JSONException e){
+                    String token = FirebaseInstanceId.getInstance().getToken();
+                    if(token != null && token.length() > 0){
+                        try{
+                            orderProgressDialog.show();
+                            DataManager.getInstance().sendOrder(getOrderString(token));
+                        }catch ( JSONException e) {
 
+                        }
+                    }else{
+                        connectionErrorDialog.show();
                     }
+
+
                 }else{
                     emptyOrderDialog.show();
                 }
@@ -156,7 +164,8 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
             }
         });
         initDialogs();
-
+        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+        Log.d(TAG, "Refreshed token: " + refreshedToken);
     }
 
     private void initDialogs(){
@@ -170,6 +179,17 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
                 .title("No hay ningun item agregado.")
                 .content("Debe agregar por lo menos 1 item del menu para realizar una order.")
                 .positiveText("Cerrar")
+                .build();
+        connectionErrorDialog = new MaterialDialog.Builder(this)
+                .title("Error de Conexión")
+                .content("Ocurrio un problema al enviar su orden. Verifique que su dispositivo este " +
+                        "conectado a la red o vuelva intentarlo en unos minutos.")
+                .positiveText("Cerrar")
+                .build();
+        orderProgressDialog = new MaterialDialog.Builder(this)
+                .content("Enviando su orden...")
+                .canceledOnTouchOutside(false)
+                .progress(true, -1)
                 .build();
     }
 
@@ -256,10 +276,11 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
 
     }
 
-    public String getOrderString(){
+    public String getOrderString(String token){
+
 
         Gson gson = new Gson();
-        Order newOrder = new Order(activeTable, DataManager.getInstance().getOderedItems(), 1, 2, 3 );
+        Order newOrder = new Order(activeTable, DataManager.getInstance().getOderedItems(),token );
         String serializedOrder = gson.toJson(newOrder);
         Log.d(TAG, "SERIALIZED ORDER: " + serializedOrder);
         return serializedOrder;
@@ -356,10 +377,14 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
     @Override
     public void onOrderSent(boolean successful) {
 
+        if(orderProgressDialog.isShowing()){
+            orderProgressDialog.dismiss();
+        }
         if(successful){
             successDialog.show();
             return;
         }
+        connectionErrorDialog.show();
 
         Log.d("ERROR", "ERROR SENDING ORDER");
 
