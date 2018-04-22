@@ -40,9 +40,11 @@ public class FireBaseMessagingService extends FirebaseMessagingService {
 
 
         Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "0")
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle("Notification")
                 .setContentText("Message")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
