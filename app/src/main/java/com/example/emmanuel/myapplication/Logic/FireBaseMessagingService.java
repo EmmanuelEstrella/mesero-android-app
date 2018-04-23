@@ -1,22 +1,30 @@
 package com.example.emmanuel.myapplication.Logic;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.nfc.Tag;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import com.example.emmanuel.myapplication.MainActivity;
+import com.example.emmanuel.myapplication.NotificationHelper;
 import com.example.emmanuel.myapplication.R;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+
+import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 
 /**
  * Created by Emmanuel on 19/04/2018.
  */
 
 public class FireBaseMessagingService extends FirebaseMessagingService {
+
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -37,24 +45,21 @@ public class FireBaseMessagingService extends FirebaseMessagingService {
             Log.d(Tag, "Message Notification Body: " + remoteMessage.getNotification().getBody());
         }
 
+        NotificationHelper helper = new NotificationHelper(this);
 
 
         Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("order", true);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, FLAG_UPDATE_CURRENT );
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "0")
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Notification")
-                .setContentText("Message")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setAutoCancel(true)
-                .setContentIntent(pendingIntent);
+        helper.getManager().notify(100, helper.getNotification("¡Buen Provecho!", "Su orden ha sido entregada.", pendingIntent).build());
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        if(MainActivity.getInstance() != null && MainActivity.getInstance().isActivityVisible()){
+            MainActivity.getInstance().displayOrderReceived();
+        }
 
-        // notificationId is a unique int for each notification that you must define
-        notificationManager.notify(0, mBuilder.build());
+
 
 
         // Also if you intend on generating your own notifications as a result of a received FCM

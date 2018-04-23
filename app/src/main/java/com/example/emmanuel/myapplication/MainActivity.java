@@ -7,7 +7,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.CountDownTimer;
 import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,6 +22,7 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.gson.Gson;
@@ -50,7 +53,10 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     private int REQUEST_ENABLE_BT =89;
 
-    MainActivity instance;
+    private static MainActivity instance;
+    private boolean isActivityVisible;
+
+    private NotificationHelper notificationHelper;
 
     private RecyclerView menuRecyclerView;
     private MenuAdapter menuAdapter;
@@ -63,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
     private MaterialDialog emptyOrderDialog;
     private MaterialDialog connectionErrorDialog;
     private MaterialDialog orderProgressDialog;
+    private MaterialDialog orderReceivedDialog;
 
 
 
@@ -83,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
         noBeaconMsg.setVisibility(View.VISIBLE);
         menuLy.setVisibility(View.GONE);
         orderButton = findViewById(R.id.order_button);
+        notificationHelper = new NotificationHelper(this);
 
         instance = this;
 
@@ -164,10 +172,22 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
             }
         });
         initDialogs();
+
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
         Log.d(TAG, "Refreshed token: " + refreshedToken);
+        Log.d(TAG, "Intent Extras:" + getIntent().getBooleanExtra("order", false));
+        if(getIntent().getBooleanExtra("order", false)){
+            displayOrderReceived();
+        }
     }
 
+    public static MainActivity getInstance(){
+        return  instance;
+    }
+
+    public boolean isActivityVisible(){
+        return isActivityVisible;
+    }
     private void initDialogs(){
         successDialog = new MaterialDialog.Builder(this)
                 .title("Gracias por ordenar")
@@ -191,8 +211,49 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
                 .canceledOnTouchOutside(false)
                 .progress(true, -1)
                 .build();
+        orderReceivedDialog = new MaterialDialog.Builder(this)
+                .title("Su orden ha llegado")
+                .content("Por favor retire su orden del mesero.")
+                .positiveText("Cerrar")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        notificationHelper.getManager().cancelAll();
+                    }
+                })
+                .build();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isActivityVisible = true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isActivityVisible = false;
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        Log.d("NOTIFICATION", "NEW INTENT");
+        displayOrderReceived();
+    }
+
+    public void  displayOrderReceived(){
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                orderReceivedDialog.show();
+            }
+        });
+
+    }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         Log.d(TAG,"On activity Request"+ requestCode);

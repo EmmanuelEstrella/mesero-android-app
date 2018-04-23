@@ -2,4 +2,7 @@
     <string name="app_name">Mesero App</string>
     <string name="no_beacons">No hay Beacons en la zona.</string>
     <string name="welcome">Bienvenido a Mesero App</string>
+    <string name="channel_name">Main Channel</string>
+    <string name="channel_description">Used to send all notifications</string>
+    <string name="main_channel_id">com.example.emmanuel.myapplication.main_channel</string>
 </resources>
