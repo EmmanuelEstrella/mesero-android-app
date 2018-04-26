@@ -123,6 +123,11 @@ public class DataManager {
                     @Override
                     public void onResponse(Response response) {
                         Log.d("RECEIVED", ""+ response.code());
+                        if(response.code() == 404){
+                            for (OrderSentListener listener : orderSentListeners) {
+                                listener.onOrderSent(false);
+                            }
+                        }
                     }
 
                     @Override

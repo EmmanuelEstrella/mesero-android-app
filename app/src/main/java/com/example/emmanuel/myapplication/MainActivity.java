@@ -242,8 +242,10 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
         super.onNewIntent(intent);
 
         Log.d("NOTIFICATION", "NEW INTENT");
+        if(intent.getBooleanExtra("order", false)){
+            displayOrderReceived(intent.getStringExtra("order_id"), intent.getStringExtra("robot_id"));
 
-        displayOrderReceived(intent.getStringExtra("order_id"), intent.getStringExtra("robot_id"));
+        }
     }
 
     public void  displayOrderReceived(String orderId, String robotId){
