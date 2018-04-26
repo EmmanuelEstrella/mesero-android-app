@@ -7,6 +7,7 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
+import com.androidnetworking.interfaces.OkHttpResponseListener;
 import com.androidnetworking.interfaces.ParsedRequestListener;
 import com.example.emmanuel.myapplication.MenuItemsListener;
 import com.example.emmanuel.myapplication.OrderSentListener;
@@ -17,6 +18,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.Response;
 
 /**
  * Created by Emmanuel on 15/04/2018.
@@ -29,6 +32,8 @@ public class DataManager {
     private ArrayList<MenuItemsListener> menuItemsListeners;
     private ArrayList<OrderSentListener> orderSentListeners;
     private List<MenuItem> menuItems;
+    private String robotId = "";
+    private String orderId ="";
     private DataManager(){
         orderSentListeners = new ArrayList<>();
         menuItemsListeners = new ArrayList<>();
@@ -39,6 +44,13 @@ public class DataManager {
             instance = new DataManager();
         }
         return instance;
+    }
+
+    public void setOrderAndRobotIds(String orderId, String robotId) {
+        this.orderId = orderId;
+        this.robotId = robotId;
+        Log.d("IDS", orderId);
+        Log.d("IDS", robotId);
     }
 
     public void setMenuItemsListeners(MenuItemsListener menuItemsListener){
@@ -102,6 +114,29 @@ public class DataManager {
 
     }
 
+    public void dismissRobot(){
+        Log.d("URL", baseUrl + "orders/"+orderId+"/dismiss?robot_id="+robotId);
+        AndroidNetworking.get(baseUrl + "orders/"+orderId+"/dismiss?robot_id="+robotId)
+                .setPriority(Priority.HIGH)
+                .build()
+                .getAsOkHttpResponse(new OkHttpResponseListener() {
+                    @Override
+                    public void onResponse(Response response) {
+                        Log.d("RECEIVED", ""+ response.code());
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        for (OrderSentListener listener : orderSentListeners) {
+                            listener.onOrderSent(false);
+                        }
+                        Log.d("RECEIVED", ""+ anError.getErrorCode());
+                        Log.d("RECEIVED", anError.getErrorBody());
+                    }
+                });
+
+
+    }
     public boolean isOrderEmpty(){
         for (MenuItem menuItem : menuItems){
             if(menuItem.getQuantity() > 0)

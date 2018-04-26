@@ -47,16 +47,19 @@ public class FireBaseMessagingService extends FirebaseMessagingService {
 
         NotificationHelper helper = new NotificationHelper(this);
 
-
+        String orderId = remoteMessage.getData().get("order_id");
+        String robotId = remoteMessage.getData().get("robot_id");
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("order", true);
+        intent.putExtra("order_id", orderId);
+        intent.putExtra("robot_id", robotId);
         intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, FLAG_UPDATE_CURRENT );
 
         helper.getManager().notify(100, helper.getNotification("¡Buen Provecho!", "Su orden ha sido entregada.", pendingIntent).build());
 
         if(MainActivity.getInstance() != null && MainActivity.getInstance().isActivityVisible()){
-            MainActivity.getInstance().displayOrderReceived();
+            MainActivity.getInstance().displayOrderReceived( orderId, robotId);
         }
 
 

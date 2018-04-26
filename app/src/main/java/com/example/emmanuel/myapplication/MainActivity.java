@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
         Log.d(TAG, "Refreshed token: " + refreshedToken);
         Log.d(TAG, "Intent Extras:" + getIntent().getBooleanExtra("order", false));
         if(getIntent().getBooleanExtra("order", false)){
-            displayOrderReceived();
+            displayOrderReceived(getIntent().getStringExtra("order_id"), getIntent().getStringExtra("robot_id"));
         }
     }
 
@@ -219,6 +219,7 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         notificationHelper.getManager().cancelAll();
+                        DataManager.getInstance().dismissRobot();
                     }
                 })
                 .build();
@@ -241,11 +242,12 @@ public class MainActivity extends AppCompatActivity implements BeaconConsumer, C
         super.onNewIntent(intent);
 
         Log.d("NOTIFICATION", "NEW INTENT");
-        displayOrderReceived();
+
+        displayOrderReceived(intent.getStringExtra("order_id"), intent.getStringExtra("robot_id"));
     }
 
-    public void  displayOrderReceived(){
-
+    public void  displayOrderReceived(String orderId, String robotId){
+        DataManager.getInstance().setOrderAndRobotIds(orderId, robotId);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
